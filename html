@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missione Eco-Agente</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f0f8ff; 
+        }
+        .game-container { 
+            width: 90%; max-width: 600px; 
+            margin: 20px auto; padding: 20px; 
+            background-color: white; 
+            border-radius: 10px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+        }
+        .item { 
+            font-size: 20px; font-weight: bold; 
+            margin: 15px; padding: 10px; 
+            background: yellow; 
+            display: inline-block; cursor: grab; 
+        }
+        .bin { 
+            display: inline-block; 
+            margin: 10px; padding: 20px; 
+            background-color: lightgray; 
+            border-radius: 5px; 
+            width: 100px; height: 100px; 
+            line-height: 100px; vertical-align: middle; 
+            font-size: 18px; cursor: pointer; 
+        }
+        .correct { background-color: lightgreen; }
+        .wrong { background-color: red; }
+        #timer { font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Missione Eco-Agente 🌍</h1>
+        <p>Trascina il rifiuto nel bidone corretto prima che scada il tempo!</p>
+        <p id="timer">⏳ Tempo: <span id="time">30</span> secondi</p>
+        <div id="waste-item" class="item" draggable="true" ondragstart="drag(event)">🧴 Bottiglia di plastica</div>
+        <div>
+            <div class="bin" id="plastica" ondrop="drop(event, 'plastica')" ondragover="allowDrop(event)">🟡 Plastica</div>
+            <div class="bin" id="carta" ondrop="drop(event, 'carta')" ondragover="allowDrop(event)">📄 Carta</div>
+            <div class="bin" id="vetro" ondrop="drop(event, 'vetro')" ondragover="allowDrop(event)">🟢 Vetro</div>
+            <div class="bin" id="umido" ondrop="drop(event, 'umido')" ondragover="allowDrop(event)">🍎 Organico</div>
+        </div>
+        <p id="feedback"></p>
+        <button onclick="nextItem()">Prossimo Rifiuto</button>
+    </div>
+
+    <script>
+        let timeLeft = 30;
+        let currentIndex = 0;
+        const wasteItems = [
+            { name: "🧴 Bottiglia di plastica", bin: "plastica" },
+            { name: "📄 Giornale", bin: "carta" },
+            { name: "🥤 Bicchiere di vetro", bin: "vetro" },
+            { name: "🍎 Bucce di mela", bin: "umido" },
+            { name: "🍕 Cartone della pizza", bin: "umido" },
+            { name: "💻 Vecchio computer", bin: "raee" }
+        ];
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event, bin) {
+            event.preventDefault();
+            let correctBin = wasteItems[currentIndex].bin;
+            let feedback = document.getElementById("feedback");
+            if (bin === correctBin) {
+                feedback.innerText = "✅ Corretto!";
+                feedback.className = "correct";
+            } else {
+                feedback.innerText = "❌ Sbagliato! Riprova!";
+                feedback.className = "wrong";
+            }
+        }
+
+        function nextItem() {
+            currentIndex = (currentIndex + 1) % wasteItems.length;
+            document.getElementById("waste-item").innerText = wasteItems[currentIndex].name;
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("feedback").className = "";
+        }
+
+        function countdown() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                document.getElementById("time").innerText = timeLeft;
+                setTimeout(countdown, 1000);
+            } else {
+                alert("⏳ Tempo scaduto! Prova di nuovo!");
+                location.reload();
+            }
+        }
+
+        countdown();
+    </script>
+</body>
+</html>
